@@ -13,5 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "standard": "^14.3.1"
+  },
+  "dependencies": {
+    "inquirer": "^7.0.4"
   }
 }
