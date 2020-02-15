@@ -1,0 +1,17 @@
+{
+  "name": "crenet-app",
+  "version": "1.0.0",
+  "description": "A boiler-plate to launch crenet-app and automate some procedures",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "crenet": "./index.js"
+  },
+  "author": "Prince-Curie",
+  "license": "ISC",
+  "devDependencies": {
+    "standard": "^14.3.1"
+  }
+}
