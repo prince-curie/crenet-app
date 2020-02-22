@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-const { exec, execSync } = require('child_process')
+const { exec, execSync, spawn } = require('child_process')
+const path = require('path')
+const fs = require('fs')
 const inquirer = require('inquirer');
 const date = new Date()
 
@@ -37,33 +39,96 @@ if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLo
       crenet new {project-name}
     `)
   } else {
-    const projectName = argument[4]
+    const projectName = argument[3]
+    console.log(projectName);
+    
     inquirer.prompt([{
       type: 'list',
       name: 'installation',
       message: 'What form of set up do you need?',
       choices: ["fullstack adonis app", 'vue and adonis', 'vue app']
     }])
-    .then(answers => {
-      installationAnswer = answers.installation;
-      if(installationAnswer == 'vue app') {
-        exec('vue --version', (error, stdout, stderr) => {
-          if (error, stderr) {
-            execSync('npm install -g @vue/cli', (error, stdout, stderr) => {
-              if(error || stderr) {
-                return console.error(`error: ${error} \n stderr: ${stderr}`);
-              }
-              
-              console.log(`stdout: ${stdout}`);
+      .then(answers => {
+        installationAnswer = answers.installation;
+        console.log(installationAnswer);
+
+
+        if (installationAnswer == 'vue app') {
+          exec('vue --version', (error, stdout, stderr) => {
+            if (error, stderr) {
+              execSync('npm install -g @vue/cli', (error, stdout, stderr) => {
+                if (error || stderr) {
+                  return console.error(`error: ${error} \n stderr: ${stderr}`);
+                }
+
+              })
+            }
+
+            const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
+            const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
+            const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
+            if (isProjectLocationAvailable === true) {
+              return console.log('You have created a project by that name.');
+            }
+            fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
+              if (err) return err;
+            });
+            process.chdir(relativeProjectLocation)
+            console.log(process.cwd());
+
+            const childProcess = spawn('vue', ['create', 'app'], {
+              stdio: ['inherit', 'inherit', 'inherit'],
+              shell: true
             })
-          }
-          exec('vue create app')
-          console.log(`stdout: ${stdout}`);
-          console.error(`stderr: ${stderr}`);
-          return 
-        })
-      }
-      
-    })
+
+            return
+          })
+        } else if (installationAnswer == 'vue and adonis') {
+          console.log('a')
+          exec('vue --version', (error, stdout, stderr) => {
+            if (error, stderr) {
+              execSync('npm install -g @vue/cli', (error, stdout, stderr) => {
+                if (error || stderr) {
+                  return console.error(`error: ${error} \n stderr: ${stderr}`);
+                }
+
+              })
+            }
+
+            const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
+            const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
+            const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
+            if (isProjectLocationAvailable === true) {
+              return console.log('You have created a project by that name.');
+            }
+            fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
+              if (err) return err;
+            });
+            process.chdir(relativeProjectLocation)
+            console.log(process.cwd());
+
+            const vueAppCreatingProcess = spawn('vue', ['create', 'app', '--api-only'], {
+              stdio: ['inherit', 'inherit', 'inherit'],
+              shell: true
+            })
+            console.log('App folder created')
+            execSync('adonis --version', (error, stdout, stderr) => {
+              if (error, stderr) {
+                execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
+                  if (error || stderr) {
+                    return console.error(`error: ${error} \n stderr: ${stderr}`);
+                  }
+                })
+              }
+            })
+
+            const adonisApiCreatingProcess = spawn('adonis', ['new', 'api'], {
+              stdio: ['inherit', 'inherit', 'inherit'],
+              shell: true
+            })
+          })
+
+        }
+      })
   }
 }
