@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { exec, execSync, spawn } = require('child_process')
+const { exec, execSync, spawn, spawnSync } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 const inquirer = require('inquirer');
@@ -46,7 +46,7 @@ if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLo
       type: 'list',
       name: 'installation',
       message: 'What form of set up do you need?',
-      choices: ["fullstack adonis app", 'vue and adonis', 'vue app']
+      choices: ["fullstack adonis app", 'vue and adonis app', 'vue app']
     }])
       .then(answers => {
         installationAnswer = answers.installation;
@@ -64,27 +64,27 @@ if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLo
               })
             }
 
-            const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
-            const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
-            const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
-            if (isProjectLocationAvailable === true) {
+            const proposedProjectPath = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
+            const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}`
+            const relativeProjectPath = path.relative(process.cwd(), proposedProjectPath)
+            const isProjectPathAvailable = fs.existsSync(relativeProjectPath)
+            if (isProjectPathAvailable === true) {
               return console.log('You have created a project by that name.');
             }
             fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
               if (err) return err;
             });
-            process.chdir(relativeProjectLocation)
+            process.chdir(proposedProjectLocation)
             console.log(process.cwd());
 
-            const childProcess = spawn('vue', ['create', 'app'], {
+            const childProcess = spawn('vue', ['create', `${projectName}`], {
               stdio: ['inherit', 'inherit', 'inherit'],
               shell: true
             })
 
             return
           })
-        } else if (installationAnswer == 'vue and adonis') {
-          console.log('a')
+        } else if (installationAnswer == 'vue and adonis app') {
           exec('vue --version', (error, stdout, stderr) => {
             if (error, stderr) {
               execSync('npm install -g @vue/cli', (error, stdout, stderr) => {
@@ -107,11 +107,11 @@ if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLo
             process.chdir(relativeProjectLocation)
             console.log(process.cwd());
 
-            const vueAppCreatingProcess = spawn('vue', ['create', 'app', '--api-only'], {
+            const vueAppCreatingProcess = spawnSync('vue', ['create', 'app'], {
               stdio: ['inherit', 'inherit', 'inherit'],
               shell: true
             })
-            console.log('App folder created')
+            console.log('App created')
             execSync('adonis --version', (error, stdout, stderr) => {
               if (error, stderr) {
                 execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
@@ -122,12 +122,41 @@ if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLo
               }
             })
 
-            const adonisApiCreatingProcess = spawn('adonis', ['new', 'api'], {
+            const adonisApiCreatingProcess = spawn('adonis', ['new', 'api', '--api-only'], {
               stdio: ['inherit', 'inherit', 'inherit'],
               shell: true
             })
           })
 
+        } else if (installationAnswer == 'fullstack adonis app') {
+          exec('adonis --version', (error, stdout, stderr) => {
+            if (error, stderr) {
+              execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
+                if (error || stderr) {
+                  return console.error(`error: ${error} \n stderr: ${stderr}`);
+                }
+
+              })
+            }
+
+            const proposedProjectPath = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
+            const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}`
+            const relativeProjectPath = path.relative(process.cwd(), proposedProjectPath)
+            const isProjectPathAvailable = fs.existsSync(relativeProjectPath)
+            if (isProjectPathAvailable === true) {
+              return console.log('You have created a project by that name.');
+            }
+            fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
+              if (err) return err;
+            });
+            process.chdir(proposedProjectLocation)
+            console.log(process.cwd());
+
+            const adonisAppCreatingProcess = spawn('adonis', ['new', `${projectName}`], {
+              stdio: ['inherit', 'inherit', 'inherit'],
+              shell: true
+            })
+          })
         }
       })
   }
