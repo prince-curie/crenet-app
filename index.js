@@ -17,14 +17,8 @@ const commands = {
 
 const { version, help, create, make } = commands
 
-if(argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLowerCase())) {
-  return console.log(`
-    Usage: crenet [version | new {project-name}]
-
-    -h, --help      Show this screen
-    -v, --version   show version
-    -n, --new       creates a new project 
-  `)
+if (argument.length > 4 || argument.length == 2 || help.includes(argument[2].toLowerCase())) {
+  return require('./commands/help')();
 
 } else if( version.includes(argument[2].toLowerCase()) ) {
   const {name, version} = require('./package.json')
