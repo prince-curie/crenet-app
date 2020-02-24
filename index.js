@@ -21,9 +21,8 @@ if (argument.length > 4 || argument.length == 2 || help.includes(argument[2].toL
   return require('./commands/help')();
 
 } else if( version.includes(argument[2].toLowerCase()) ) {
-  const {name, version} = require('./package.json')
+  return require('./commands/version')();
 
-  return console.log(`${name} ${version}`)
 } else if ( create.includes(argument[2].toLowerCase()) ) {
   if (argument[3] == null) {
     return console.log(`
