@@ -5,18 +5,38 @@ const date = new Date()
 
 const InstallLocation = {
   singleFrameworkApp: (stackUse, projectName) => {
-    const proposedPath = `c:/crenet/${stackUse}s/${date.getFullYear()}/${projectName}`
-    const proposedLocation = `c:/crenet/${stackUse}s/${date.getFullYear()}`
+    const proposedPath = `c:/crenet/${stackUse}/${date.getFullYear()}/${projectName}`
+    const proposedLocation = `c:/crenet/${stackUse}/${date.getFullYear()}`
     const relativePath = path.relative(process.cwd(), proposedPath)
     const isPathAvailable = fs.existsSync(relativePath)
+
     if (isPathAvailable === true) {
-      throw Error(`You have created a ${stackUse} by that name.`);
+      throw Error(`You have created a ${stackUse} by this name.`);
     }
+
     fs.mkdirSync(proposedLocation, { recursive: true }, (err) => {
       if (err) throw Error(err);
     });
+
     process.chdir(proposedLocation)
     return console.log(`${process.cwd()}\\${projectName}`)
+  },
+
+  twoFrameworksApp: (stackUse, projectName) => {
+    const proposedProjectLocation = `c:/crenet/${stackUse}/${date.getFullYear()}/${projectName}`
+    const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
+    const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
+
+    if (isProjectLocationAvailable === true) {
+      throw Error(`You have created a ${stackUse} by that name.`);
+    }
+
+    fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
+      if (err) throw Error(err);
+    });
+
+    process.chdir(relativeProjectLocation)
+    return console.log(process.cwd());
   }
 }
 
