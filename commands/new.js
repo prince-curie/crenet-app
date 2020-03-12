@@ -1,150 +1,113 @@
-const { exec, execSync, spawn, spawnSync } = require('child_process')
-const path = require('path')
-const fs = require('fs')
-const date = new Date()
 const Install = require('../utils/install')
 const run = require('../utils/run')
-
+const { rmdirSync } = require('fs')
 
 module.exports = async function (argument) {
   try {
     if (argument[3] == null) {
       return require('../utils/noProjectName')()
-
     } else {
       const projectName = argument[3]
 
       const makeInquiry = require('../utils/inquiry')
-      let installationAnswer = await makeInquiry(
+      const installationAnswer = await makeInquiry(
         'What stack will be used?',
-        ["fullstack adonis app", 'vue and adonis app', 'vue app', 'react app', 'react and adonis app'],
-        'What is the stack for?', ["Project", "Practice"]
+        ['fullstack adonis app', 'vue and adonis app', 'vue app', 'react app', 'react and adonis app'],
+        'What is the stack for?', ['project', 'practice']
       )
 
-      let ancestorFolder = installationAnswer.useCase
-      let techStack = installationAnswer.stackEnquiry
+      const ancestorFolder = installationAnswer.useCase
+      const techStack = installationAnswer.stackEnquiry
 
-      if (techStack == 'vue app') {
+      if (techStack === 'vue app') {
+        Install.singleFrameworkApp(ancestorFolder, projectName)
+
         await run.useExecSync('vue --version')
           .then(res => console.log(res.toString()))
           .catch((err) => {
+            console.log(err)
             run.useSpawn('npm', ['i', '-g', '@vue/cli'])
+          }).then(res => res)
+          .catch(err => {
+            throw err
           })
 
-        Install.singleFrameworkApp(ancestorFolder, projectName)
-
         return await run.useSpawn('vue', ['create', `${projectName}`])
-
-      } else if (techStack == 'react app') {
+          .then(res => res)
+          .catch(err => {
+            throw err
+          })
+      } else if (techStack === 'react app') {
         Install.singleFrameworkApp(ancestorFolder, projectName)
 
         return await run.useSpawn('npx', ['create-react-app', `${projectName}`])
-    } else if (techStack == 'vue and adonis app') {
+      } else if (techStack === 'vue and adonis app') {
+        Install.twoFrameworksApp(ancestorFolder, projectName)
+
         await run.useExecSync('vue --version')
           .then(res => console.log(res.toString()))
           .catch((err) => {
+            console.log(err)
             run.useSpawn('npm', ['i', '-g', '@vue/cli'])
           })
 
-          const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
-          const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
-          const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
-          if (isProjectLocationAvailable === true) {
-            return console.log('You have created a project by that name.');
-          }
-          fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
-            if (err) return err;
-          });
-          process.chdir(relativeProjectLocation)
-          console.log(process.cwd());
-
-          const vueAppCreatingProcess = spawnSync('vue', ['create', 'app'], {
-            stdio: ['inherit', 'inherit', 'inherit'],
-            shell: true
-          })
-          console.log('App created')
-          execSync('adonis --version', (error, stdout, stderr) => {
-            if (error, stderr) {
-              execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
-                if (error || stderr) {
-                  return console.error(`error: ${error} \n stderr: ${stderr}`);
-                }
-              })
-            }
+        await run.useExecSync('adonis --version')
+          .then(res => console.log(res.toString()))
+          .catch((err) => {
+            console.log(err)
+            run.useSpawn('npm', ['i', '-g', '@adonisjs/cli'])
           })
 
-          const adonisApiCreatingProcess = spawn('adonis', ['new', 'api', '--api-only'], {
-            stdio: ['inherit', 'inherit', 'inherit'],
-            shell: true
+        await run.useSpawn('vue', ['create', 'app'])
+        const createApi = await run.useSpawn('adonis', ['new', 'api', '--api-only'])
+        createApi.catch(err => { throw err })
+      } else if (techStack === 'fullstack adonis app') {
+        const { useSpawn } = run
+        const installationDirectory = Install.singleFrameworkApp(ancestorFolder, projectName)
+
+        await run.useExecSync('adonis --version')
+          .then(res => console.log(res.toString()))
+          .catch((err) => {
+            console.log(err)
+            run.useSpawn('npm', ['i', '-g', '@adonisjs/cli'])
           })
-        })
-
-      } else if (installationAnswer == 'fullstack adonis app') {
-        exec('adonis --version', (error, stdout, stderr) => {
-          if (error, stderr) {
-            execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
-              if (error || stderr) {
-                return console.error(`error: ${error} \n stderr: ${stderr}`);
-              }
-
-            })
-          }
-
-          const proposedProjectPath = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
-          const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}`
-          const relativeProjectPath = path.relative(process.cwd(), proposedProjectPath)
-          const isProjectPathAvailable = fs.existsSync(relativeProjectPath)
-          if (isProjectPathAvailable === true) {
-            return console.log('You have created a project by that name.');
-          }
-          fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
-            if (err) return err;
-          });
-          process.chdir(proposedProjectLocation)
-          console.log(process.cwd());
-
-          const adonisAppCreatingProcess = spawn('adonis', ['new', `${projectName}`], {
-            stdio: ['inherit', 'inherit', 'inherit'],
-            shell: true
+        await useSpawn('adonis', ['new', `${projectName}`])
+          .then(res => res)
+          .catch(err => {
+            console.log('deleted')
+            rmdirSync(installationDirectory)
+            throw err
           })
-        })
-      } else if (installationAnswer == 'react and adonis app') {
-        const proposedProjectLocation = `c:/crenet/projects/${date.getFullYear()}/${projectName}`
-        const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
-        const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
-        if (isProjectLocationAvailable === true) {
-          return console.log('You have created a project by that name.');
-        }
-        fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
-          if (err) return err;
-        });
-        process.chdir(relativeProjectLocation)
-        console.log(process.cwd());
+      } else if (techStack === 'react and adonis app') {
+        const installationDirectory = Install.twoFrameworksApp(ancestorFolder, projectName)
 
-        const reactAppCreatingProcess = spawnSync('npx', ['create-react-app', 'app'], {
-          stdio: ['inherit', 'inherit', 'inherit'],
-          shell: true
-        })
+        await run.useExecSync('adonis --version')
+          .then(res => console.log(res.toString()))
+          .catch((err) => {
+            console.log(err)
+            run.useSpawn('npm', ['i', '-g', '@adonisjs/cli'])
+          })
 
-        execSync('adonis --version', (error, stdout, stderr) => {
-          if (error, stderr) {
-            execSync('npm i -g @adonisjs/cli', (error, stdout, stderr) => {
-              if (error || stderr) {
-                return console.error(`error: ${error} \n stderr: ${stderr}`);
-              }
-            })
-          }
-        })
+        await run.useSpawn('adonis', ['new', 'api', '--api-only'])
+          .then(res => res)
+          .catch(err => {
+            rmdirSync(installationDirectory)
+            console.log('deleted')
+            throw err
+          })
 
-        const adonisApiCreatingProcess = spawn('adonis', ['new', 'api', '--api-only'], {
-          stdio: ['inherit', 'inherit', 'inherit'],
-          shell: true
-        })
+        await run.useSpawn('npx', ['create-react-app', 'app'])
+          .then(res => res)
+          .catch(err => {
+            rmdirSync(installationDirectory)
+            console.log('deleted')
+            throw err
+          })
         return
       }
     }
   } catch (error) {
+    console.log('an eror occured')
     return console.log(error.message)
   }
-  
 }
