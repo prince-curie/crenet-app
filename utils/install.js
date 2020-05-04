@@ -10,7 +10,8 @@ const InstallLocation = {
     const isPathAvailable = fs.existsSync(relativePath)
 
     if (isPathAvailable === true) {
-      throw Error(`You have created a ${stackUse} by this name.`)
+      process.exitCode = 1
+      throw Error('You have a folder by that name, kindly delete the folder or use a different name.')
     }
 
     fs.mkdirSync(proposedLocation, { recursive: true }, (err) => {
@@ -23,12 +24,15 @@ const InstallLocation = {
   },
 
   twoFrameworksApp: (stackUse, projectName) => {
-    const proposedProjectLocation = `c:/crenet/${stackUse}/${date.getFullYear()}/${projectName}`
+    const stackUsage = stackUse === 'project' ? `${stackUse}s` : stackUse
+
+    const proposedProjectLocation = `c:/crenet/${stackUsage}/${date.getFullYear()}/${projectName}`
     const relativeProjectLocation = path.relative(process.cwd(), proposedProjectLocation)
     const isProjectLocationAvailable = fs.existsSync(relativeProjectLocation)
 
     if (isProjectLocationAvailable === true) {
-      throw Error(`You have created a ${stackUse} by that name.`)
+      process.exitCode = 1
+      throw Error('You have a folder by that name, kindly delete the folder or use a different name.')
     }
 
     fs.mkdirSync(proposedProjectLocation, { recursive: true }, (err) => {
