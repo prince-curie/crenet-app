@@ -3,8 +3,7 @@ const argument =  process.argv
 const commands = {
   version : [ '-v' , '--version' ],
   help : [ '-h' , '--help' ],
-  create : [ '-n' , '--new' ],
-  make :  [ "-m" , "make" ]
+  create : [ '-n' , '--new' ]
 }
 
 const { version, help, create, make } = commands
