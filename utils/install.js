@@ -1,11 +1,13 @@
 const path = require('path')
 const fs = require('fs')
 const date = new Date()
+const workingdirectory = process.cwd()
+const rootDirectory = path.parse(workingdirectory).root
 
 const InstallLocation = {
   singleFrameworkApp: (stackUse, projectName) => {
-    const proposedPath = `c:/crenet/${stackUse}/${date.getFullYear()}/${projectName}`
-    const proposedLocation = `c:/crenet/${stackUse}/${date.getFullYear()}`
+    const proposedPath = `${rootDirectory}crenet/${stackUse}/${date.getFullYear()}/${projectName}`
+    const proposedLocation = `${rootDirectory}crenet/${stackUse}/${date.getFullYear()}`
     const relativePath = path.relative(process.cwd(), proposedPath)
     const isPathAvailable = fs.existsSync(relativePath)
 
