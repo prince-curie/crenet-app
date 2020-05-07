@@ -1,7 +1,7 @@
 {
   "name": "create-crenet-app",
   "version": "0.1.2",
-  "description": "A project generator to initialie the creating of apps in Crenet",
+  "description": "A project generator handling the creation of projects at Crenet.",
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha --recursive"
