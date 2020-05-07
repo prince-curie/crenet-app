@@ -1,6 +1,6 @@
 {
   "name": "create-crenet-app",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A project generator handling the creation of projects at Crenet.",
   "main": "index.js",
   "scripts": {
