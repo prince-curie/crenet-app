@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 
-const makeInquiry = (stackQuestion, stackchoices, useCaseQuestion, useCaseChoices) => {
+const makeInquiry = (stackQuestion, stackChoices, useCaseQuestion, useCaseChoices) => {
   return inquirer.prompt([{
     type: 'list',
     name: 'useCase',
@@ -11,7 +11,7 @@ const makeInquiry = (stackQuestion, stackchoices, useCaseQuestion, useCaseChoice
     type: 'list',
     name: 'stackEnquiry',
     message: stackQuestion,
-    choices: stackchoices 
+    choices: stackChoices 
   }])
 }
 
